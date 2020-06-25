@@ -10,6 +10,9 @@ exports.__esModule = true;
 exports.getPairings = void 0;
 var MatcherUtils_1 = require("./MatcherUtils");
 var MatcherConstants_1 = require("./MatcherConstants");
+/* ------------------
+    Graph Creation
+  ------------------- */
 function getNeighbors(vertex, potentialOpponents) {
     return potentialOpponents.filter(function (opponent) {
         return Math.abs(opponent.rating - vertex.rating) <= MatcherConstants_1.ALLOWED_RATING_DIFFERENCE;
@@ -17,10 +20,8 @@ function getNeighbors(vertex, potentialOpponents) {
 }
 function getLonelyNeighbors(vertex) {
     var lonelyNeighbors = [];
-    console.log("Getting lonely neighbors for ", vertex.name);
     for (var _i = 0, _a = vertex.neighbors; _i < _a.length; _i++) {
         var neighbor = _a[_i];
-        console.log("Neighbor", neighbor.name, "has degree", neighbor.neighbors.length);
         if (neighbor.neighbors.length == 1) {
             lonelyNeighbors.push(neighbor);
         }
@@ -36,6 +37,7 @@ function createGraph(playerListA, playerListB) {
         aVertices.push({
             name: player.name,
             rating: player.rating,
+            gang: "A",
             neighbors: [],
             lonelyNeighbors: []
         });
@@ -45,6 +47,7 @@ function createGraph(playerListA, playerListB) {
         bVertices.push({
             name: player.name,
             rating: player.rating,
+            gang: "B",
             neighbors: [],
             lonelyNeighbors: []
         });
@@ -72,8 +75,163 @@ function createGraph(playerListA, playerListB) {
     }
     return __spreadArrays(aVertices, bVertices);
 }
-MatcherUtils_1.printGraph(createGraph(MatcherConstants_1.testListA, MatcherConstants_1.testListB));
-function getPairings() {
-    return [];
+function arrayRemove(array, elt) {
+    var index = array.indexOf(elt);
+    if (index > -1) {
+        array.splice(index, 1);
+    }
+}
+function removeVertex(vertex, graph) {
+    // Remove references to the vertex from its neighbors adjacency lists
+    for (var _i = 0, _a = vertex.neighbors; _i < _a.length; _i++) {
+        var neighbor = _a[_i];
+        arrayRemove(neighbor.neighbors, vertex);
+    }
+    // Remove itself from the graph
+    arrayRemove(graph, vertex);
+}
+function formatName(vertex) {
+    return vertex.name + " - " + vertex.rating;
+}
+function pairAndRemove(vertex1, vertex2, graph, pairing) {
+    console.log("Pairing", vertex1.name, "with", vertex2.name);
+    pairing.pairs.push({
+        aPlayerName: formatName(vertex1.gang === "A" ? vertex1 : vertex2),
+        bPlayerName: formatName(vertex1.gang === "A" ? vertex2 : vertex1)
+    });
+    // After pairing, both vertices are removed from the working graph
+    removeVertex(vertex1, graph);
+    removeVertex(vertex2, graph);
+}
+/** Removes stranded players from the graph and adds them to the benchedPlayers list.
+    Modifies both objects in-place */
+function handleStrandedPlayers(graph, pairing) {
+    // Loop backwards so splicing objects doesn't mess with the loop
+    for (var i = graph.length - 1; i >= 0; i--) {
+        var player = graph[i];
+        if (player.neighbors.length == 0) {
+            console.log("Removing stranded player", player.name);
+            removeVertex(player, graph);
+            pairing.benchedPlayers.push({
+                name: player.name,
+                gang: player.gang,
+                legalSubstitutions: []
+            });
+        }
+    }
+}
+function handleNonCompetingLoners(graph, pairing) {
+    // Find all vertices who have exactly one lonely neighbor
+    var adjacentToOneLoner = graph.filter(function (x) { return x.lonelyNeighbors.length == 1; });
+    var didModifyGraph = adjacentToOneLoner.length > 0;
+    while (adjacentToOneLoner.length > 0) {
+        // The first vertex in the list pairs itself with the lonely neighbor
+        var vSelf = adjacentToOneLoner[0];
+        var vLoner = vSelf.lonelyNeighbors[0];
+        pairAndRemove(vSelf, vLoner, graph, pairing);
+        removeVertex(vSelf, adjacentToOneLoner);
+        removeVertex(vLoner, adjacentToOneLoner);
+    }
+    return didModifyGraph;
+}
+function getBestOpponent(vertex, possibleOpponents) {
+    var minDelta = -1;
+    var bestOpponent = possibleOpponents[0]; // Only set to avoid setting this to null
+    for (var _i = 0, possibleOpponents_1 = possibleOpponents; _i < possibleOpponents_1.length; _i++) {
+        var opponent = possibleOpponents_1[_i];
+        var delta = Math.abs(opponent.rating - vertex.rating);
+        if (minDelta == -1 || delta < minDelta) {
+            minDelta = delta;
+            bestOpponent = opponent;
+        }
+    }
+    return bestOpponent;
+}
+function handleCompetingLoners(graph, pairing) {
+    // Find all vertices who get to choose between multiple loners
+    var selectorVertices = graph.filter(function (x) { return x.lonelyNeighbors.length > 1; });
+    var didModifyGraph = selectorVertices.length > 0;
+    while (selectorVertices.length > 0) {
+        // The first vertex in the list pairs itself with its closest-rated lonely neighbor
+        var vSelf = selectorVertices[0];
+        var vLoner = getBestOpponent(vSelf, vSelf.lonelyNeighbors);
+        pairAndRemove(vSelf, vLoner, graph, pairing);
+        removeVertex(vSelf, selectorVertices);
+        removeVertex(vLoner, selectorVertices);
+    }
+    return didModifyGraph;
+}
+function matchHighestRankedPlayer(graph, pairing) {
+    if (graph.length == 0) {
+        return;
+    }
+    // Get the highest ranked player
+    var maxRating = -9999999;
+    var highestRankedPlayer = graph[0]; // To avoid dealing with null
+    for (var _i = 0, graph_1 = graph; _i < graph_1.length; _i++) {
+        var player = graph_1[_i];
+        if (player.rating > maxRating) {
+            maxRating = player.rating;
+        }
+    }
+    var possibleOpponents = graph.filter(function (x) { return x.gang !== highestRankedPlayer.gang; });
+    var closestOpponent = getBestOpponent(highestRankedPlayer, possibleOpponents);
+    pairAndRemove(highestRankedPlayer, closestOpponent, graph, pairing);
+}
+function addLegalSubstitutions(pairing, initialGraph) {
+    var _loop_1 = function (benchedPlayer) {
+        // Look through all their neighbors and see if their assigned opponent would
+        // be a valid opponent for the benched player
+        var originalNeighbors = initialGraph.filter(function (x) { return x.name === benchedPlayer.name; })[0].neighbors;
+        var _loop_2 = function (possibleOpponent) {
+            var relevantPair = pairing.pairs.filter(function (pair) {
+                return pair.aPlayerName.includes(possibleOpponent.name) ||
+                    pair.bPlayerName.includes(possibleOpponent.name);
+            })[0];
+            var teammateToSwapWith = benchedPlayer.gang === "A"
+                ? relevantPair.aPlayerName
+                : relevantPair.bPlayerName;
+            console.log("Found legal substitution:", benchedPlayer.name, "for", teammateToSwapWith);
+            benchedPlayer.legalSubstitutions.push(teammateToSwapWith);
+        };
+        for (var _i = 0, originalNeighbors_1 = originalNeighbors; _i < originalNeighbors_1.length; _i++) {
+            var possibleOpponent = originalNeighbors_1[_i];
+            _loop_2(possibleOpponent);
+        }
+    };
+    for (var _i = 0, _a = pairing.benchedPlayers; _i < _a.length; _i++) {
+        var benchedPlayer = _a[_i];
+        _loop_1(benchedPlayer);
+    }
+}
+function getPairings(listA, listB) {
+    var initialGraph = createGraph(listA, listB);
+    MatcherUtils_1.printGraph(initialGraph);
+    console.log("\nStarting pairings");
+    // Re-create the graph from scratch since it contains infinite loops and can't be cloned
+    var workingGraph = createGraph(listA, listB);
+    var pairing = {
+        pairs: [],
+        benchedPlayers: []
+    };
+    MatcherUtils_1.printGraphMini(workingGraph);
+    // Keep looping through applying the algorithm until it reaches a steady state
+    var prevSize = -1;
+    while (prevSize == -1 || workingGraph.length < prevSize) {
+        prevSize = workingGraph.length;
+        // Loop through the 4 phases of the alg, restarting the steps changes to the graph are made
+        handleStrandedPlayers(workingGraph, pairing);
+        if (handleNonCompetingLoners(workingGraph, pairing)) {
+            continue;
+        }
+        if (handleCompetingLoners(workingGraph, pairing)) {
+            continue;
+        }
+        matchHighestRankedPlayer(workingGraph, pairing);
+    }
+    addLegalSubstitutions(pairing, initialGraph);
+    MatcherUtils_1.printGraph(workingGraph);
+    return pairing;
 }
 exports.getPairings = getPairings;
+console.log("\n\n Resulting pairing:", getPairings(MatcherUtils_1.convertPbList(MatcherConstants_1.CtlAList), MatcherUtils_1.convertPbList(MatcherConstants_1.CtlBList)));
