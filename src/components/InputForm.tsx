@@ -71,7 +71,7 @@ class InputForm extends Component<InputFormProps, InputFormState> {
   }
 
   parsePlayerData(textareaInput: string) {
-    const playerNames = textareaInput.split("\n").filter((x) => x.length > 0);
+    const playerNames = textareaInput.split(/\n|,/).filter((x) => x.length > 0);
     console.log("Defending players raw", playerNames);
     const playerDataList = [];
     const invalidPlayerNames = [];
@@ -79,7 +79,7 @@ class InputForm extends Component<InputFormProps, InputFormState> {
     // Match the entered player names with their player data when possible
     for (let playerName of playerNames) {
       const filtered = this.state.playerDataList.filter(
-        (x) => x.name.toUpperCase() === playerName.toUpperCase()
+        (x) => x.name.trim().toUpperCase() === playerName.trim().toUpperCase()
       );
       if (filtered.length === 1) {
         playerDataList.push(filtered[0]);
@@ -118,7 +118,9 @@ class InputForm extends Component<InputFormProps, InputFormState> {
 
           {/* Player list for challenging gang */}
           <div className="main-label">Participants from Challenging Gang</div>
-          <div className="secondary-label">One per line, no commas</div>
+          <div className="secondary-label">
+            Put newlines or commas between names
+          </div>
           <textarea
             className="participant-list-textarea"
             onChange={this.handleChallengingGangPlayersChanged}
@@ -126,7 +128,9 @@ class InputForm extends Component<InputFormProps, InputFormState> {
 
           {/* Player list for challenging gang */}
           <div className="main-label">Participants from Challenging Gang</div>
-          <div className="secondary-label">One per line, no commas</div>
+          <div className="secondary-label">
+            Put newlines or commas between names
+          </div>
           <textarea
             className="participant-list-textarea"
             onChange={this.handleDefendingGangPlayersChanged}
