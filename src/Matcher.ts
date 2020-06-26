@@ -1,13 +1,58 @@
 import { printGraph, printGraphMini, convertPbList } from "./MatcherUtils";
 import {
-  Vertex,
-  PlayerData,
   ALLOWED_RATING_DIFFERENCE,
   testListA,
   testListB,
   CtlAList,
   CtlBList,
 } from "./MatcherConstants";
+
+/**
+ * This class takes two lists of players with Elo-like ratings, and automatically matches them up,
+ * maximizing the number of people who can play (1st priority), and the proximity of skill (2nd priority)
+ *
+ * The Algorithm:
+ *
+ * 0) Create a bipartite graph where people who can face each other are connected
+ * while(graph not empty)
+ *    1) remove any vertices with degree 0 and "bench" them
+ *    2) find vertices with degree 1 (who aren't competing for the same opponents) and pair them off
+ *    3) resolve vertices with degree 1 who *are* fighting over the same opponents
+ *    4) if all degrees 2+, match the highest rated player with their closest match
+ *
+ * (if any of these steps)
+ */
+
+export interface Vertex {
+  id: number;
+  name: string;
+  rating: number;
+  gang: string;
+  neighbors: Array<Vertex>;
+  lonelyNeighbors: Array<Vertex>;
+}
+
+export interface PlayerData {
+  id: number;
+  name: string;
+  rating: number;
+}
+
+export interface BenchedPlayer {
+  name: string;
+  gang: string;
+  legalSubstitutions: Array<string>;
+}
+
+export interface Pair {
+  aPlayerName: string;
+  bPlayerName: string;
+}
+
+export interface Pairing {
+  pairs: Array<Pair>;
+  benchedPlayers: Array<BenchedPlayer>;
+}
 
 /* ------------------
     Graph Creation 
@@ -26,7 +71,7 @@ function getNeighbors(
 function getLonelyNeighbors(vertex: Vertex): Array<Vertex> {
   let lonelyNeighbors = [];
   for (let neighbor of vertex.neighbors) {
-    if (neighbor.neighbors.length == 1) {
+    if (neighbor.neighbors.length === 1) {
       lonelyNeighbors.push(neighbor);
     }
   }
@@ -43,6 +88,7 @@ function createGraph(
 
   for (let player of playerListA) {
     aVertices.push({
+      id: player.id,
       name: player.name,
       rating: player.rating,
       gang: "A",
@@ -52,6 +98,7 @@ function createGraph(
   }
   for (let player of playerListB) {
     bVertices.push({
+      id: player.id,
       name: player.name,
       rating: player.rating,
       gang: "B",
@@ -87,22 +134,6 @@ function createGraph(
 /* ------------------
     Pairing Process 
   ------------------- */
-
-interface BenchedPlayer {
-  name: string;
-  gang: string;
-  legalSubstitutions: Array<string>;
-}
-
-interface Pair {
-  aPlayerName: string;
-  bPlayerName: string;
-}
-
-interface Pairing {
-  pairs: Array<Pair>;
-  benchedPlayers: Array<BenchedPlayer>;
-}
 
 function arrayRemove(array: Array<any>, elt: any) {
   var index = array.indexOf(elt);
@@ -143,7 +174,7 @@ function handleStrandedPlayers(graph: Array<Vertex>, pairing: Pairing) {
   // Loop backwards so splicing objects doesn't mess with the loop
   for (let i = graph.length - 1; i >= 0; i--) {
     const player = graph[i];
-    if (player.neighbors.length == 0) {
+    if (player.neighbors.length === 0) {
       console.log("Removing stranded player", player.name);
       removeVertex(player, graph);
       pairing.benchedPlayers.push({
@@ -160,7 +191,9 @@ function handleNonCompetingLoners(
   pairing: Pairing
 ): boolean {
   // Find all vertices who have exactly one lonely neighbor
-  const adjacentToOneLoner = graph.filter((x) => x.lonelyNeighbors.length == 1);
+  const adjacentToOneLoner = graph.filter(
+    (x) => x.lonelyNeighbors.length === 1
+  );
   const didModifyGraph = adjacentToOneLoner.length > 0;
   while (adjacentToOneLoner.length > 0) {
     // The first vertex in the list pairs itself with the lonely neighbor
@@ -178,7 +211,7 @@ function getBestOpponent(vertex: Vertex, possibleOpponents: Array<Vertex>) {
   let bestOpponent = possibleOpponents[0]; // Only set to avoid setting this to null
   for (let opponent of possibleOpponents) {
     const delta = Math.abs(opponent.rating - vertex.rating);
-    if (minDelta == -1 || delta < minDelta) {
+    if (minDelta === -1 || delta < minDelta) {
       minDelta = delta;
       bestOpponent = opponent;
     }
@@ -205,7 +238,7 @@ function handleCompetingLoners(
 }
 
 function matchHighestRankedPlayer(graph: Array<Vertex>, pairing: Pairing) {
-  if (graph.length == 0) {
+  if (graph.length === 0) {
     return;
   }
   // Get the highest ranked player
@@ -273,7 +306,7 @@ export function getPairings(
 
   // Keep looping through applying the algorithm until it reaches a steady state
   let prevSize = -1;
-  while (prevSize == -1 || workingGraph.length < prevSize) {
+  while (prevSize === -1 || workingGraph.length < prevSize) {
     prevSize = workingGraph.length;
     // Loop through the 4 phases of the alg, restarting the steps changes to the graph are made
     handleStrandedPlayers(workingGraph, pairing);
@@ -293,7 +326,7 @@ export function getPairings(
   return pairing;
 }
 
-console.log(
-  "\n\n Resulting pairing:",
-  getPairings(convertPbList(CtlAList), convertPbList(CtlBList))
-);
+// console.log(
+//   "\n\n Resulting pairing:",
+//   getPairings(convertPbList(CtlAList), convertPbList(CtlBList))
+// );

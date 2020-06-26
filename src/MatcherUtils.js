@@ -19,6 +19,7 @@ exports.printGraphMini = printGraphMini;
 /** Converts a list with names and PBs to names and ratings */
 function convertPbList(list) {
     return list.map(function (x) { return ({
+        id: x.id,
         name: x.name,
         rating: 0.85 * x.pb + 400
     }); });

@@ -1,4 +1,4 @@
-import { Vertex } from "./MatcherConstants";
+import { Vertex } from "./Matcher";
 
 export function printGraph(graph: Array<Vertex>) {
   console.log("\n\nGraph: [");
@@ -29,6 +29,7 @@ export function printGraphMini(graph: Array<Vertex>) {
 /** Converts a list with names and PBs to names and ratings */
 export function convertPbList(list: Array<any>) {
   return list.map((x) => ({
+    id: x.id,
     name: x.name,
     rating: 0.85 * x.pb + 400,
   }));

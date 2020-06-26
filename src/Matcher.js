@@ -10,6 +10,21 @@ exports.__esModule = true;
 exports.getPairings = void 0;
 var MatcherUtils_1 = require("./MatcherUtils");
 var MatcherConstants_1 = require("./MatcherConstants");
+/**
+ * This class takes two lists of players with Elo-like ratings, and automatically matches them up,
+ * maximizing the number of people who can play (1st priority), and the proximity of skill (2nd priority)
+ *
+ * The Algorithm:
+ *
+ * 0) Create a bipartite graph where people who can face each other are connected
+ * while(graph not empty)
+ *    1) remove any vertices with degree 0 and "bench" them
+ *    2) find vertices with degree 1 (who aren't competing for the same opponents) and pair them off
+ *    3) resolve vertices with degree 1 who *are* fighting over the same opponents
+ *    4) if all degrees 2+, match the highest rated player with their closest match
+ *
+ * (if any of these steps)
+ */
 /* ------------------
     Graph Creation
   ------------------- */
@@ -22,7 +37,7 @@ function getLonelyNeighbors(vertex) {
     var lonelyNeighbors = [];
     for (var _i = 0, _a = vertex.neighbors; _i < _a.length; _i++) {
         var neighbor = _a[_i];
-        if (neighbor.neighbors.length == 1) {
+        if (neighbor.neighbors.length === 1) {
             lonelyNeighbors.push(neighbor);
         }
     }
@@ -35,6 +50,7 @@ function createGraph(playerListA, playerListB) {
     for (var _i = 0, playerListA_1 = playerListA; _i < playerListA_1.length; _i++) {
         var player = playerListA_1[_i];
         aVertices.push({
+            id: player.id,
             name: player.name,
             rating: player.rating,
             gang: "A",
@@ -45,6 +61,7 @@ function createGraph(playerListA, playerListB) {
     for (var _a = 0, playerListB_1 = playerListB; _a < playerListB_1.length; _a++) {
         var player = playerListB_1[_a];
         bVertices.push({
+            id: player.id,
             name: player.name,
             rating: player.rating,
             gang: "B",
@@ -90,14 +107,11 @@ function removeVertex(vertex, graph) {
     // Remove itself from the graph
     arrayRemove(graph, vertex);
 }
-function formatName(vertex) {
-    return vertex.name + " - " + vertex.rating;
-}
 function pairAndRemove(vertex1, vertex2, graph, pairing) {
     console.log("Pairing", vertex1.name, "with", vertex2.name);
     pairing.pairs.push({
-        aPlayerName: formatName(vertex1.gang === "A" ? vertex1 : vertex2),
-        bPlayerName: formatName(vertex1.gang === "A" ? vertex2 : vertex1)
+        aPlayerName: vertex1.gang === "A" ? vertex1.name : vertex2.name,
+        bPlayerName: vertex1.gang === "A" ? vertex2.name : vertex1.name
     });
     // After pairing, both vertices are removed from the working graph
     removeVertex(vertex1, graph);
@@ -109,7 +123,7 @@ function handleStrandedPlayers(graph, pairing) {
     // Loop backwards so splicing objects doesn't mess with the loop
     for (var i = graph.length - 1; i >= 0; i--) {
         var player = graph[i];
-        if (player.neighbors.length == 0) {
+        if (player.neighbors.length === 0) {
             console.log("Removing stranded player", player.name);
             removeVertex(player, graph);
             pairing.benchedPlayers.push({
@@ -122,7 +136,7 @@ function handleStrandedPlayers(graph, pairing) {
 }
 function handleNonCompetingLoners(graph, pairing) {
     // Find all vertices who have exactly one lonely neighbor
-    var adjacentToOneLoner = graph.filter(function (x) { return x.lonelyNeighbors.length == 1; });
+    var adjacentToOneLoner = graph.filter(function (x) { return x.lonelyNeighbors.length === 1; });
     var didModifyGraph = adjacentToOneLoner.length > 0;
     while (adjacentToOneLoner.length > 0) {
         // The first vertex in the list pairs itself with the lonely neighbor
@@ -140,7 +154,7 @@ function getBestOpponent(vertex, possibleOpponents) {
     for (var _i = 0, possibleOpponents_1 = possibleOpponents; _i < possibleOpponents_1.length; _i++) {
         var opponent = possibleOpponents_1[_i];
         var delta = Math.abs(opponent.rating - vertex.rating);
-        if (minDelta == -1 || delta < minDelta) {
+        if (minDelta === -1 || delta < minDelta) {
             minDelta = delta;
             bestOpponent = opponent;
         }
@@ -162,7 +176,7 @@ function handleCompetingLoners(graph, pairing) {
     return didModifyGraph;
 }
 function matchHighestRankedPlayer(graph, pairing) {
-    if (graph.length == 0) {
+    if (graph.length === 0) {
         return;
     }
     // Get the highest ranked player
@@ -185,8 +199,8 @@ function addLegalSubstitutions(pairing, initialGraph) {
         var originalNeighbors = initialGraph.filter(function (x) { return x.name === benchedPlayer.name; })[0].neighbors;
         var _loop_2 = function (possibleOpponent) {
             var relevantPair = pairing.pairs.filter(function (pair) {
-                return pair.aPlayerName.includes(possibleOpponent.name) ||
-                    pair.bPlayerName.includes(possibleOpponent.name);
+                return pair.aPlayerName === possibleOpponent.name ||
+                    pair.bPlayerName === possibleOpponent.name;
             })[0];
             var teammateToSwapWith = benchedPlayer.gang === "A"
                 ? relevantPair.aPlayerName
@@ -217,7 +231,7 @@ function getPairings(listA, listB) {
     MatcherUtils_1.printGraphMini(workingGraph);
     // Keep looping through applying the algorithm until it reaches a steady state
     var prevSize = -1;
-    while (prevSize == -1 || workingGraph.length < prevSize) {
+    while (prevSize === -1 || workingGraph.length < prevSize) {
         prevSize = workingGraph.length;
         // Loop through the 4 phases of the alg, restarting the steps changes to the graph are made
         handleStrandedPlayers(workingGraph, pairing);
@@ -234,4 +248,7 @@ function getPairings(listA, listB) {
     return pairing;
 }
 exports.getPairings = getPairings;
-console.log("\n\n Resulting pairing:", getPairings(MatcherUtils_1.convertPbList(MatcherConstants_1.CtlAList), MatcherUtils_1.convertPbList(MatcherConstants_1.CtlBList)));
+// console.log(
+//   "\n\n Resulting pairing:",
+//   getPairings(convertPbList(CtlAList), convertPbList(CtlBList))
+// );

@@ -1,0 +1,54 @@
+#sheets-data-textarea {
+  height: 150px;
+  width: 600px;
+  color: #777;
+}
+
+.participant-list-textarea {
+  height: 80px;
+}
+
+.form-container {
+  padding: 40px;
+  background-color: #4a515f;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+#main-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-label {
+  font-size: 18px;
+}
+
+.secondary-label {
+  font-size: 14px;
+  font-style: italic;
+}
+
+#main-form textarea {
+  margin-bottom: 20px;
+}
+
+#status-text {
+  color: red;
+  font-size: 20px;
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+#submit-button {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  margin-top: 20px;
+}
+
+#submit-button:hover {
+  background-color: blanchedalmond;
+}

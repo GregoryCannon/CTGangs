@@ -1,0 +1,34 @@
+.result-container {
+  padding: 40px;
+  background: #d0bdaf;
+}
+
+#result-title {
+  margin: 0px;
+  font-weight: 700;
+}
+
+.result-section-title {
+  margin: 24px 0 8px;
+}
+
+.result-container ul,
+.result-container li,
+.result-container p {
+  font-size: 16px;
+}
+
+.result-container table {
+  font-size: 16px;
+  color: black;
+  min-width: 300px;
+  margin: auto;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: aliceblue;
+}
+
+table tbody tr:nth-child(odd) {
+  background-color: blanchedalmond;
+}
