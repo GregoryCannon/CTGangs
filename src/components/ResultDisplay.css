@@ -25,6 +25,10 @@
   margin: auto;
 }
 
+th {
+  font-weight: 500;
+}
+
 table tbody tr:nth-child(even) {
   background-color: aliceblue;
 }

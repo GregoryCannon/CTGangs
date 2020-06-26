@@ -74,6 +74,9 @@ class InputForm extends Component<InputFormProps, InputFormState> {
     const playerNames = textareaInput.split("\n").filter((x) => x.length > 0);
     console.log("Defending players raw", playerNames);
     const playerDataList = [];
+    const invalidPlayerNames = [];
+
+    // Match the entered player names with their player data when possible
     for (let playerName of playerNames) {
       const filtered = this.state.playerDataList.filter(
         (x) => x.name.toUpperCase() === playerName.toUpperCase()
@@ -81,15 +84,19 @@ class InputForm extends Component<InputFormProps, InputFormState> {
       if (filtered.length === 1) {
         playerDataList.push(filtered[0]);
       } else {
-        this.setState({
-          statusText:
-            this.state.statusText +
-            "\nUnable to find player " +
-            playerName +
-            " in spreadsheet data",
-        });
+        invalidPlayerNames.push(playerName);
       }
     }
+
+    // Show error message if there were invalid player names
+    if (invalidPlayerNames.length > 0) {
+      this.setState({
+        statusText:
+          "Unable to find spreadsheet data for: " +
+          invalidPlayerNames.join(", "),
+      });
+    }
+
     return playerDataList;
   }
 
