@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { PlayerData } from "./Matcher";
+import { PlayerData } from "../matcher/Matcher";
 import "./InputForm.css";
 
 interface InputFormProps {

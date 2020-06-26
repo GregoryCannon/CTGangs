@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import "./App.css";
-import { getPairings, PlayerData, Pairing } from "./Matcher";
+import { getPairings, PlayerData, Pairing } from "../matcher/Matcher";
 import { ResultDisplay } from "./ResultDisplay";
 import InputForm from "./InputForm";
 

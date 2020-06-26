@@ -1,6 +1,6 @@
 import React from "react";
 import "./ResultDisplay.css";
-import { Pairing, Pair, BenchedPlayer } from "./Matcher";
+import { Pairing, Pair, BenchedPlayer } from "../matcher/Matcher";
 
 interface ResultDisplayProps {
   result: Pairing;
