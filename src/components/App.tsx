@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import "./App.css";
-import { getPairings, PlayerData, Pairing } from "../matcher/Matcher";
+import { getPairings, PlayerData, Pairing } from "../matcher/OptimalMatcher";
 import { ResultDisplay } from "./ResultDisplay";
 import InputForm from "./InputForm";
 
@@ -8,7 +8,7 @@ interface AppState {
   result: Pairing;
 }
 
-const NO_RESULT = { pairs: [], benchedPlayers: [] };
+const NO_RESULT: Pairing = { pairs: [], benchedPlayers: [] };
 
 class App extends Component<{}, AppState> {
   constructor(props: {}) {
@@ -24,8 +24,9 @@ class App extends Component<{}, AppState> {
     challengingPlayerData: Array<PlayerData>,
     defendingPlayerData: Array<PlayerData>
   ) {
+    const result = getPairings(challengingPlayerData, defendingPlayerData);
     this.setState({
-      result: getPairings(challengingPlayerData, defendingPlayerData),
+      result,
     });
   }
 
@@ -43,7 +44,9 @@ class App extends Component<{}, AppState> {
           {this.state.result == NO_RESULT ? (
             <div />
           ) : (
-            <ResultDisplay result={this.state.result} />
+            <div>
+              <ResultDisplay result={this.state.result} />
+            </div>
           )}
         </div>
       </div>
