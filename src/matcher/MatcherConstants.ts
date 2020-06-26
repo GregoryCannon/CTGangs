@@ -1,30 +1,32 @@
-import { PlayerData } from "./Matcher";
+import { PlayerData } from "./OptimalMatcher";
 
 export const ALLOWED_RATING_DIFFERENCE = 200;
 
 export const testListA: Array<PlayerData> = [
   {
     id: 1,
+    gangName: "Sflat",
     name: "GregBoomCannon",
     rating: 1220,
   },
-  { id: 2, name: "Kofi", rating: 1380 },
-  { id: 3, name: "dog", rating: 1540 },
-  { id: 4, name: "Boone", rating: 600 },
-  { id: 5, name: "Arower", rating: 20 },
-  { id: 6, name: "Crower", rating: 100 },
+  { id: 2, gangName: "Sflat", name: "Kofi", rating: 1380 },
+  { id: 3, gangName: "Sflat", name: "dog", rating: 1540 },
+  { id: 4, gangName: "Sflat", name: "Boone", rating: 600 },
+  { id: 5, gangName: "Sflat", name: "Arower", rating: 20 },
+  { id: 6, gangName: "Sflat", name: "Crower", rating: 100 },
 ];
 
 export const testListB: Array<PlayerData> = [
   {
     id: 7,
+    gangName: "Svert",
     name: "JD",
     rating: 1580,
   },
-  { id: 8, name: "Jake", rating: 1560 },
-  { id: 9, name: "gizmo", rating: 960 },
-  { id: 10, name: "Samantha", rating: 700 },
-  { id: 11, name: "Brower", rating: 40 },
+  { id: 8, gangName: "Svert", name: "Jake", rating: 1560 },
+  { id: 9, gangName: "Svert", name: "gizmo", rating: 960 },
+  { id: 10, gangName: "Svert", name: "Samantha", rating: 700 },
+  { id: 11, gangName: "Svert", name: "Brower", rating: 40 },
 ];
 
 export const CtlAList = [

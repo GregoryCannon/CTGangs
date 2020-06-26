@@ -1,12 +1,18 @@
 import React from "react";
 import "./ResultDisplay.css";
-import { Pairing, Pair, BenchedPlayer } from "../matcher/Matcher";
+import {
+  Pairing,
+  Pair,
+  BenchedPlayer,
+  PlayerData,
+} from "../matcher/OptimalMatcher";
 
 interface ResultDisplayProps {
   result: Pairing;
 }
 
 export function ResultDisplay(props: ResultDisplayProps) {
+  console.log("ResultDisplay props", props);
   return (
     <div className="result-container">
       <h2 id="result-title">Results</h2>
@@ -18,7 +24,7 @@ export function ResultDisplay(props: ResultDisplayProps) {
           <tbody>
             {props.result.pairs.map((pair: Pair) => (
               <tr>
-                <td>{pair.aPlayerName + " vs. " + pair.bPlayerName}</td>
+                <td>{pair.aPlayer.name + " vs. " + pair.bPlayer.name}</td>
               </tr>
             ))}
           </tbody>
@@ -35,6 +41,7 @@ export function ResultDisplay(props: ResultDisplayProps) {
             <thead>
               <tr>
                 <th>Player</th>
+                <th>Gang</th>
                 <th>Could Sub For</th>
               </tr>
             </thead>
@@ -42,11 +49,12 @@ export function ResultDisplay(props: ResultDisplayProps) {
               {props.result.benchedPlayers.map(
                 (benchedPlayer: BenchedPlayer) => (
                   <tr>
-                    <td>{benchedPlayer.name}</td>
+                    <td>{benchedPlayer.playerData.name}</td>
+                    <td>{benchedPlayer.playerData.gangName}</td>
                     <td>
                       {benchedPlayer.legalSubstitutions.length > 0 ? (
                         benchedPlayer.legalSubstitutions.map(
-                          (subName: string) => <div>{subName}</div>
+                          (sub: PlayerData) => <div>{sub.name}</div>
                         )
                       ) : (
                         <em>None possible</em>

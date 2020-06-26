@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { PlayerData } from "../matcher/Matcher";
 import "./InputForm.css";
+import { PlayerData } from "../matcher/OptimalMatcher";
 
 interface InputFormProps {
   submitFunction: Function;
@@ -41,12 +41,13 @@ class InputForm extends Component<InputFormProps, InputFormState> {
       return {
         id: parseInt(tabSeparatedData[0]),
         name: tabSeparatedData[1],
+        gangName: tabSeparatedData[2],
         rating: parseInt(tabSeparatedData[7]),
       };
     });
-    console.log(playerDataList);
+    console.log("Player data:", playerDataList);
     this.setState({
-      playerDataList,
+      playerDataList: playerDataList,
     });
   }
 
@@ -70,9 +71,8 @@ class InputForm extends Component<InputFormProps, InputFormState> {
     this.props.submitFunction(challengingPlayerData, defendingPlayerData);
   }
 
-  parsePlayerData(textareaInput: string) {
+  parsePlayerData(textareaInput: string): Array<PlayerData> {
     const playerNames = textareaInput.split(/\n|,/).filter((x) => x.length > 0);
-    console.log("Defending players raw", playerNames);
     const playerDataList = [];
     const invalidPlayerNames = [];
 
