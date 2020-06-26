@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/CTGangs/public/index.html/static/css/main.47cfb8ae.chunk.css",
-    "main.js": "/CTGangs/public/index.html/static/js/main.6d999b51.chunk.js",
-    "main.js.map": "/CTGangs/public/index.html/static/js/main.6d999b51.chunk.js.map",
-    "runtime-main.js": "/CTGangs/public/index.html/static/js/runtime-main.f730f270.js",
-    "runtime-main.js.map": "/CTGangs/public/index.html/static/js/runtime-main.f730f270.js.map",
-    "static/js/2.7fa07eda.chunk.js": "/CTGangs/public/index.html/static/js/2.7fa07eda.chunk.js",
-    "static/js/2.7fa07eda.chunk.js.map": "/CTGangs/public/index.html/static/js/2.7fa07eda.chunk.js.map",
-    "index.html": "/CTGangs/public/index.html/index.html",
-    "precache-manifest.f62b48cf55ad770a17b93531a5e1e8c1.js": "/CTGangs/public/index.html/precache-manifest.f62b48cf55ad770a17b93531a5e1e8c1.js",
-    "service-worker.js": "/CTGangs/public/index.html/service-worker.js",
-    "static/css/main.47cfb8ae.chunk.css.map": "/CTGangs/public/index.html/static/css/main.47cfb8ae.chunk.css.map",
-    "static/js/2.7fa07eda.chunk.js.LICENSE.txt": "/CTGangs/public/index.html/static/js/2.7fa07eda.chunk.js.LICENSE.txt"
+    "main.css": "/CTGangs/static/css/main.47cfb8ae.chunk.css",
+    "main.js": "/CTGangs/static/js/main.330d1393.chunk.js",
+    "main.js.map": "/CTGangs/static/js/main.330d1393.chunk.js.map",
+    "runtime-main.js": "/CTGangs/static/js/runtime-main.ae335f12.js",
+    "runtime-main.js.map": "/CTGangs/static/js/runtime-main.ae335f12.js.map",
+    "static/js/2.7fa07eda.chunk.js": "/CTGangs/static/js/2.7fa07eda.chunk.js",
+    "static/js/2.7fa07eda.chunk.js.map": "/CTGangs/static/js/2.7fa07eda.chunk.js.map",
+    "index.html": "/CTGangs/index.html",
+    "precache-manifest.ace826156f55aa70af2a3ccd43e0fb6e.js": "/CTGangs/precache-manifest.ace826156f55aa70af2a3ccd43e0fb6e.js",
+    "service-worker.js": "/CTGangs/service-worker.js",
+    "static/css/main.47cfb8ae.chunk.css.map": "/CTGangs/static/css/main.47cfb8ae.chunk.css.map",
+    "static/js/2.7fa07eda.chunk.js.LICENSE.txt": "/CTGangs/static/js/2.7fa07eda.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.f730f270.js",
+    "static/js/runtime-main.ae335f12.js",
     "static/js/2.7fa07eda.chunk.js",
     "static/css/main.47cfb8ae.chunk.css",
-    "static/js/main.6d999b51.chunk.js"
+    "static/js/main.330d1393.chunk.js"
   ]
 }
