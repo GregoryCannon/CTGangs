@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import "./InputForm.css";
 import { PlayerData } from "../matcher/OptimalMatcher";
+import { fetchSpreadsheetData } from "../sheet-parser/sheet-parser";
 
 interface InputFormProps {
   submitFunction: Function;
 }
 
 interface InputFormState {
-  playerDataList: Array<PlayerData>;
   challengingGangPlayersText: string;
   defendingGangPlayersText: string;
   statusText: string;
@@ -17,14 +17,10 @@ class InputForm extends Component<InputFormProps, InputFormState> {
   constructor(props: InputFormProps) {
     super(props);
     this.state = {
-      playerDataList: [],
       challengingGangPlayersText: "",
       defendingGangPlayersText: "",
       statusText: "",
     };
-    this.handleSpreadsheetDataChange = this.handleSpreadsheetDataChange.bind(
-      this
-    );
     this.handleDefendingGangPlayersChanged = this.handleDefendingGangPlayersChanged.bind(
       this
     );
@@ -32,23 +28,6 @@ class InputForm extends Component<InputFormProps, InputFormState> {
       this
     );
     this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleSpreadsheetDataChange(event: any) {
-    const rowsRaw = event.target.value.split("\n");
-    const playerDataList = rowsRaw.map((rowString: string) => {
-      const tabSeparatedData = rowString.split("\t");
-      return {
-        id: parseInt(tabSeparatedData[0]),
-        name: tabSeparatedData[1],
-        gangName: tabSeparatedData[2],
-        rating: parseInt(tabSeparatedData[7]),
-      };
-    });
-    console.log("Player data:", playerDataList);
-    this.setState({
-      playerDataList: playerDataList,
-    });
   }
 
   handleChallengingGangPlayersChanged(event: any) {
@@ -61,28 +40,38 @@ class InputForm extends Component<InputFormProps, InputFormState> {
 
   handleSubmit(event: any) {
     event.preventDefault();
-    const challengingPlayerData = this.parsePlayerData(
-      this.state.challengingGangPlayersText
-    );
-    const defendingPlayerData = this.parsePlayerData(
-      this.state.defendingGangPlayersText
-    );
 
-    this.props.submitFunction(challengingPlayerData, defendingPlayerData);
+    // Fetch the player data from the spreadsheet
+    fetchSpreadsheetData((spreadsheetPlayerData: Array<PlayerData>) => {
+      console.log("\n\n Spreadsheet player data:", spreadsheetPlayerData);
+      const challengingPlayerData = this.filterPlayerData(
+        this.state.challengingGangPlayersText,
+        spreadsheetPlayerData
+      );
+      const defendingPlayerData = this.filterPlayerData(
+        this.state.defendingGangPlayersText,
+        spreadsheetPlayerData
+      );
+
+      this.props.submitFunction(challengingPlayerData, defendingPlayerData);
+    });
   }
 
-  parsePlayerData(textareaInput: string): Array<PlayerData> {
+  filterPlayerData(
+    textareaInput: string,
+    spreadsheetPlayerData: Array<PlayerData>
+  ): Array<PlayerData> {
     const playerNames = textareaInput.split(/\n|,/).filter((x) => x.length > 0);
-    const playerDataList = [];
+    const filteredPlayerData = [];
     const invalidPlayerNames = [];
 
     // Match the entered player names with their player data when possible
     for (let playerName of playerNames) {
-      const filtered = this.state.playerDataList.filter(
+      const filtered = spreadsheetPlayerData.filter(
         (x) => x.name.trim().toUpperCase() === playerName.trim().toUpperCase()
       );
       if (filtered.length === 1) {
-        playerDataList.push(filtered[0]);
+        filteredPlayerData.push(filtered[0]);
       } else {
         invalidPlayerNames.push(playerName);
       }
@@ -97,7 +86,7 @@ class InputForm extends Component<InputFormProps, InputFormState> {
       });
     }
 
-    return playerDataList;
+    return filteredPlayerData;
   }
 
   render() {
@@ -105,17 +94,6 @@ class InputForm extends Component<InputFormProps, InputFormState> {
       <div className="form-container">
         <p id="status-text">{this.state.statusText}</p>
         <form id="main-form" onSubmit={this.handleSubmit}>
-          {/* Box to paste the player data from Google Sheets */}
-          <div className="main-label">Spreadsheet Player Data</div>
-          <div className="secondary-label">
-            Make a box selecting all relevant players in the spreadsheet, and
-            then copy paste it here
-          </div>
-          <textarea
-            id="sheets-data-textarea"
-            onChange={this.handleSpreadsheetDataChange}
-          ></textarea>
-
           {/* Player list for challenging gang */}
           <div className="main-label">Participants from Challenging Gang</div>
           <div className="secondary-label">
@@ -126,8 +104,8 @@ class InputForm extends Component<InputFormProps, InputFormState> {
             onChange={this.handleChallengingGangPlayersChanged}
           ></textarea>
 
-          {/* Player list for challenging gang */}
-          <div className="main-label">Participants from Challenging Gang</div>
+          {/* Player list for defending gang */}
+          <div className="main-label">Participants from Defending Gang</div>
           <div className="secondary-label">
             Put newlines or commas between names
           </div>
