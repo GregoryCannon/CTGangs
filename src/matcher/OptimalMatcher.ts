@@ -31,11 +31,15 @@ const DUMMY_PLAYER: PlayerData = {
   gangName: "",
 };
 
-const NON_MATCH_COST = 10000; // The penalty if an two players who can't play are matched (i.e. they both get benched)
+const NON_MATCH_COST = 10000; // The penalty if two players who can't play are matched (i.e. they both get benched)
 const ALLOWED_RATING_GAP = 200;
 
 function canPlay(aPlayer: PlayerData, bPlayer: PlayerData) {
-  return Math.abs(aPlayer.rating - bPlayer.rating) <= ALLOWED_RATING_GAP;
+  return (
+    aPlayer !== DUMMY_PLAYER &&
+    bPlayer !== DUMMY_PLAYER &&
+    Math.abs(aPlayer.rating - bPlayer.rating) <= ALLOWED_RATING_GAP
+  );
 }
 
 function benchPlayer(player: PlayerData, pairing: Pairing) {
