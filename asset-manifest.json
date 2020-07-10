@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/CTGangs/static/css/main.68ecf879.chunk.css",
-    "main.js": "/CTGangs/static/js/main.f15a0e5b.chunk.js",
-    "main.js.map": "/CTGangs/static/js/main.f15a0e5b.chunk.js.map",
+    "main.js": "/CTGangs/static/js/main.508b51ba.chunk.js",
+    "main.js.map": "/CTGangs/static/js/main.508b51ba.chunk.js.map",
     "runtime-main.js": "/CTGangs/static/js/runtime-main.ae335f12.js",
     "runtime-main.js.map": "/CTGangs/static/js/runtime-main.ae335f12.js.map",
     "static/js/2.d1c49586.chunk.js": "/CTGangs/static/js/2.d1c49586.chunk.js",
     "static/js/2.d1c49586.chunk.js.map": "/CTGangs/static/js/2.d1c49586.chunk.js.map",
     "index.html": "/CTGangs/index.html",
-    "precache-manifest.e12ffe2c508223726dc0820187ea896d.js": "/CTGangs/precache-manifest.e12ffe2c508223726dc0820187ea896d.js",
+    "precache-manifest.457b0df5a907a31b8b4a5a791921e3d3.js": "/CTGangs/precache-manifest.457b0df5a907a31b8b4a5a791921e3d3.js",
     "service-worker.js": "/CTGangs/service-worker.js",
     "static/css/main.68ecf879.chunk.css.map": "/CTGangs/static/css/main.68ecf879.chunk.css.map",
     "static/js/2.d1c49586.chunk.js.LICENSE.txt": "/CTGangs/static/js/2.d1c49586.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.ae335f12.js",
     "static/js/2.d1c49586.chunk.js",
     "static/css/main.68ecf879.chunk.css",
-    "static/js/main.f15a0e5b.chunk.js"
+    "static/js/main.508b51ba.chunk.js"
   ]
 }
