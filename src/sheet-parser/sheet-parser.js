@@ -14,8 +14,8 @@ function createPlayerList(sheetsData) {
     return sheetsData.map(function (entry) { return ({
         id: entry[0],
         name: entry[1],
-        gangName: entry[4],
-        rating: entry[9]
+        gangName: entry[3],
+        rating: entry[8]
     }); });
 }
 function formatSheetsData(rawString) {
@@ -35,6 +35,6 @@ function formatSheetsData(rawString) {
     finalRows = finalRows.filter(function (row) { return row[1] !== "&nbsp;"; });
     return finalRows;
 }
-fetchSpreadsheetData(function (result) {
-    console.log(result);
-});
+// fetchSpreadsheetData((result: any) => {
+//   console.log(result);
+// });
