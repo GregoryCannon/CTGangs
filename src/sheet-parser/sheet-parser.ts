@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 
 export function fetchSpreadsheetData(callback: Function) {
   fetch(
-    "https://docs.google.com/spreadsheets/u/0/d/1lSTbhpqodhqQn7Dg5cN-lcBavdOuimGOKFMg9tVhIMA/gviz/tq?tqx=out:html&tq&gid=1513281692"
+    "https://docs.google.com/spreadsheets/u/0/d/1lSTbhpqodhqQn7Dg5cN-lcBavdOuimGOKFMg9tVhIMA/gviz/tq?tqx=out:html&tq&gid=1540266327"
   )
     .then((res: any) => res.text())
     .then((body: string) => {
@@ -14,8 +14,8 @@ function createPlayerList(sheetsData: Array<Array<string>>) {
   return sheetsData.map((entry: Array<string>) => ({
     id: entry[0],
     name: entry[1],
-    gangName: entry[2],
-    rating: entry[7],
+    gangName: entry[4],
+    rating: entry[9],
   }));
 }
 
@@ -44,3 +44,7 @@ function formatSheetsData(rawString: string) {
   finalRows = finalRows.filter((row) => row[1] !== "&nbsp;");
   return finalRows;
 }
+
+// fetchSpreadsheetData((result: any) => {
+//   console.log(result);
+// });

@@ -3,7 +3,7 @@ exports.__esModule = true;
 exports.fetchSpreadsheetData = void 0;
 var fetch = require("node-fetch");
 function fetchSpreadsheetData(callback) {
-    fetch("https://docs.google.com/spreadsheets/u/0/d/1lSTbhpqodhqQn7Dg5cN-lcBavdOuimGOKFMg9tVhIMA/gviz/tq?tqx=out:html&tq&gid=1513281692")
+    fetch("https://docs.google.com/spreadsheets/u/0/d/1lSTbhpqodhqQn7Dg5cN-lcBavdOuimGOKFMg9tVhIMA/gviz/tq?tqx=out:html&tq&gid=1540266327")
         .then(function (res) { return res.text(); })
         .then(function (body) {
         callback(createPlayerList(formatSheetsData(body)));
@@ -14,8 +14,8 @@ function createPlayerList(sheetsData) {
     return sheetsData.map(function (entry) { return ({
         id: entry[0],
         name: entry[1],
-        gangName: entry[2],
-        rating: entry[7]
+        gangName: entry[4],
+        rating: entry[9]
     }); });
 }
 function formatSheetsData(rawString) {
@@ -35,3 +35,6 @@ function formatSheetsData(rawString) {
     finalRows = finalRows.filter(function (row) { return row[1] !== "&nbsp;"; });
     return finalRows;
 }
+fetchSpreadsheetData(function (result) {
+    console.log(result);
+});
