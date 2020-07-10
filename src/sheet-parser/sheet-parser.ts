@@ -14,8 +14,8 @@ function createPlayerList(sheetsData: Array<Array<string>>) {
   return sheetsData.map((entry: Array<string>) => ({
     id: entry[0],
     name: entry[1],
-    gangName: entry[4],
-    rating: entry[9],
+    gangName: entry[3],
+    rating: entry[8],
   }));
 }
 
