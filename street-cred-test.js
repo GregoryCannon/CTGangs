@@ -147,7 +147,7 @@ function runOneSim() {
     }
   }
   log("Complete simulation with no divergence");
-  return [-1, isWellOrdered];
+  return [-1, isWellOrdered()];
 }
 
 function main() {
